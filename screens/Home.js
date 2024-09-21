@@ -1,9 +1,7 @@
 import { View, Text,Image,SafeAreaView,StyleSheet ,ScrollView} from 'react-native'
 import React, { useContext } from 'react'
 import FitnessCard from '../components/FitnessCard'
-import { FitnessItems } from '../Context';
-
-
+import { FitnessAppItems } from '../Context';
 
 const HomeScreen = () => {
 
@@ -12,7 +10,7 @@ const HomeScreen = () => {
     minutes,
     calories,
     workout,
-  } = useContext(FitnessItems);
+  } = useContext(FitnessAppItems);
   return (
 
     

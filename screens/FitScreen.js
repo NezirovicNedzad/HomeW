@@ -1,7 +1,7 @@
 import { View, Text,SafeAreaView,Image, Pressable } from 'react-native'
 import React, { useContext, useEffect, useState } from 'react'
 import { useNavigation, useRoute } from '@react-navigation/native';
-import { FitnessItems } from '../Context';
+import { FitnessAppItems} from '../Context';
 
 const FitScreen = ({navigation}) => {
       
@@ -21,7 +21,7 @@ const {
   setCalories,
   setWorkout,
   workout,
-} = useContext(FitnessItems);
+} = useContext(FitnessAppItems);
 
 
 

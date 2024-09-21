@@ -4,7 +4,7 @@ import { useEffect } from 'react';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { useRoute } from '@react-navigation/native';
 import { AntDesign, Ionicons } from '@expo/vector-icons';
-import { FitnessItems } from '../Context';
+import { FitnessAppItems } from '../Context';
 
 function WorkoutScreen  ({navigation})  {
 
@@ -17,7 +17,7 @@ const {
   completed,
   setCompleted,
  
-} = useContext(FitnessItems);
+} = useContext(FitnessAppItems);
 
 
 

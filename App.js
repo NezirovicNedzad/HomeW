@@ -8,19 +8,25 @@ import { createDrawerNavigator } from '@react-navigation/drawer';
 
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import DrawerNavigation from './components/DrawerNavigation';
-import { FitnessContext } from './Context';
+import { FitnessAppContext,AuthContext } from './Context';
+import { useContext } from 'react';
+import AuthStack from './components/AuthStack';
 
 
 export default function App() {
-
+ 
 
   return (
-    <FitnessContext>
+    <FitnessAppContext>
+       
     <SafeAreaProvider>
-      
-    <DrawerNavigation/>
+    <AuthContext.Consumer>
+          {({ isAuthenticated }) => (
+            isAuthenticated ? <DrawerNavigation /> : <AuthStack />
+          )}
+        </AuthContext.Consumer>
     </SafeAreaProvider>
-    </FitnessContext>
+    </FitnessAppContext>
   );
 }
 
