@@ -8,7 +8,7 @@ import HomeScreen from '../screens/Home';
 import ProfileScreen from '../screens/ProfilePage';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import NewsScreen from '../screens/News';
+import ScheduleScreen from '../screens/Schedule';
 import CustomDrawerContent from './CustomDrawerContent';
 import HomeStack from './StackNavigator';
 import { useNavigation } from '@react-navigation/native';
@@ -70,16 +70,16 @@ paddingTop:'60px',
           
           component={ProfileScreen} />
           
-          <Drawer.Screen name="News"
+          <Drawer.Screen name="Workout Schedule"
           options={{
-            drawerLabel:'News',
-            headerTitle:'Newsfeed',
+            drawerLabel:'Workout Schedule',
+            headerTitle:'Workout Schedule',
             drawerIcon:({size,color})=>(
-              <Ionicons name='newspaper-outline' size={size} color={color}/>
+              <Ionicons name='calendar' size={size} color={color}/>
             )        }}
           
           
-          component={NewsScreen} />
+          component={ScheduleScreen} />
       
         </Drawer.Navigator>
 
