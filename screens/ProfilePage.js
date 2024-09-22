@@ -24,7 +24,7 @@ export default function ProfileScreen() {
 
 
       <Text>Email:{userData.email}</Text>
-      
+      <Text>Id:{userData.id}</Text>
       <Text>Username:{userData.username}</Text>
       <Text>Role:{userData.role}</Text>
       <Button title="Logout" onPress={handleLogout} />

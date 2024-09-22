@@ -15,6 +15,7 @@ const LoginScreen = ({ navigation }) => {
     const result = await handleLogin(email, password);
     if (result.success) {
       const userData = {
+        id:result.data.id,
         username: result.data.username,
         email: result.data.email,
         name: result.data.name,
@@ -24,6 +25,7 @@ const LoginScreen = ({ navigation }) => {
       };
       Alert.alert('Success', 'You have successfully logged in!', [{ text: 'OK' }]);
       await saveLogin(userData);
+      console.log(result);
       setIsAuthenticated(true);
      
     } else {

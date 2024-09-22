@@ -30,32 +30,7 @@ export const handleLogin = async (email, password) => {
   }
 };
 
-  export const getPrograms = async () => {
-    try {
-        
-      const response = await fetch('http://192.168.253.145:83/api/FitnessProgram', {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      
-      });
 
-
-     
-    if (response.ok) {
-        // Login successful, return the user data and token
-        return { success: true, t: result.token, data: result.data };
-      } else {
-        // Login failed, return the error instead of message
-        return { success: false, error: result.error  };
-      }
-    } catch (error) {
-      // Handle any network or unexpected errors
-      return { success: false,errorM:error,message:error.message};
-    }
-  
-  };
 // Assuming you have a config file for the API URL
 
 export const registerUser = async ({ name, surname, gender, dateOfBirth, password, username,email }) => {
