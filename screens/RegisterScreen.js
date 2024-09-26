@@ -70,8 +70,18 @@ const RegisterScreen = ({navigation}) => {
       setLoading(false); // Stop loading
 
       if (result.success) {
+        const userData = {
+          id:result.data.id,
+          username: result.data.username,
+          email: result.data.email,
+          name: result.data.name,
+          surname: result.data.surname,
+          dateOfBirth: result.data.dateOfBirth,
+          role: result.data.role,
+        };
+        saveLogin(userData);
         Alert.alert('Success', 'You have registered successfully!', [{ text: 'OK' }]);
-saveLogin(formData)
+
         setIsAuthenticated(true);
         // Optionally, navigate to login screen or reset form fields
       } else {

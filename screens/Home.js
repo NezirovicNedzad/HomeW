@@ -2,6 +2,7 @@ import { View, Text,Image,SafeAreaView,StyleSheet ,ScrollView} from 'react-nativ
 import React, { useContext } from 'react'
 import FitnessCard from '../components/FitnessCard'
 import { FitnessAppItems } from '../Context';
+import ImageSlider from '../components/ImageSlider';
 
 const HomeScreen = () => {
 
@@ -39,7 +40,8 @@ const HomeScreen = () => {
         
 
                 <View style={{ justifyContent: "center", alignItems: "center" }}>
-                  <Image
+                
+                 <Image
                     style={{
                       width: "90%",
                       height: 120,

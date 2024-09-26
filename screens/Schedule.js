@@ -2,6 +2,8 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { View, Text, Button, FlatList, StyleSheet, Modal, TextInput, Platform, Alert } from 'react-native';
 import { Calendar } from 'react-native-calendars';
+import * as Notifications from 'expo-notifications';
+
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { Picker } from '@react-native-picker/picker';
 import { createWorkout } from '../services/workoutService';
@@ -9,6 +11,11 @@ import { getFitnesPrograms } from '../services/fitnessProgramService';
 import { getWorkoutsByUser } from '../services/workoutService';
 import { AuthContext } from '../Context';
 import moment from 'moment-timezone';
+import { ActivityIndicator } from 'react-native';
+
+
+// Ask for notification permissions
+
 const ScheduleScreen = () => {
   
   const [selectedDate, setSelectedDate] = useState('');
@@ -21,6 +28,7 @@ const ScheduleScreen = () => {
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [showTimePicker, setShowTimePicker] = useState(false);
   const{userData}=useContext(AuthContext);
+  const [loading, setLoading] = useState(false); 
   const today = new Date();
   const formatTimeFromTimestamp = (timestamp) => {
     const date = new Date(timestamp);
@@ -29,6 +37,71 @@ const ScheduleScreen = () => {
     const seconds = date.getSeconds().toString().padStart(2, '0'); // Get minutes and format to 2 digits
     return `${hours}:${minutes}:${seconds}`; // Return formatted time
   };
+  const scheduleQuickNotification = async () => {
+    const notificationId = await Notifications.scheduleNotificationAsync({
+      content: {
+        title: 'Test Notification',
+        body: 'This is a test notification for 5 seconds later',
+      },
+      trigger: {
+        seconds: 5, // Notification will appear in 5 seconds
+      },
+    });
+  
+    console.log(`Test notification scheduled with ID: ${notificationId}`);
+  };
+  
+  const requestNotificationPermission = async () => {
+    const { status } = await Notifications.requestPermissionsAsync();
+    if (status !== 'granted') {
+      alert('You need to enable notifications in settings');
+      return false;
+    }
+    return true;
+  };
+
+  // Schedule a local notification for the workout
+  const scheduleNotification = async (workout) => {
+     // Assuming `workout.date` is a valid date and `workout.time` is a Date object for time
+     const notificationTime = moment(workout.date).tz('Europe/Belgrade').set({
+      hour: workout.time.getHours(),
+      minute: workout.time.getMinutes(),
+      second: 0,
+    }).subtract(5,'seconds');
+  // Log the notification time to debug
+  console.log("Current time:", new Date());
+  console.log("Scheduled notification time:", notificationTime.toDate());
+  console.log("Workout id:",workout.name)
+  const adjustedNotificationTime = notificationTime.subtract(30, 'second');
+  // Check if the notification time is in the future
+  if (notificationTime.isAfter(moment().tz('Europe/Belgrade'))) {
+    await Notifications.scheduleNotificationAsync({
+      content: {
+        title: 'Workout Reminder!',
+        body: `It's time for your workout: ${workout.name}`,
+        data: { workoutName: workout.name }, 
+        sound: 'default',
+      },
+      trigger: {
+        date: notificationTime.toDate(), // Schedule the notification for the exact time
+      },
+    });
+    console.log('Notification scheduled!');
+  } else {
+    console.error('Notification time is in the past, cannot schedule.');
+  }
+  };
+
+  // Handle notification while app is in foreground
+  Notifications.setNotificationHandler({
+    handleNotification: async () => ({
+      shouldShowAlert: true,
+      shouldPlaySound: true,
+      shouldSetBadge: true,
+    }),
+  });
+
+
   const  addWorkout = async () => {
    // const result =  createWorkout(userData.id)
    const selectedDate = moment(newWorkout.date).tz('Europe/Belgrade').startOf('day').format('YYYY-MM-DD'); // Set to start of the day
@@ -72,6 +145,10 @@ const ScheduleScreen = () => {
         setWorkouts({ ...workouts });
         setNewWorkout({ name: '', date: new Date(), time: new Date() });
         setModalVisible(false);
+        const permissionGranted = await requestNotificationPermission();
+        if (permissionGranted) {
+          await scheduleNotification(newWorkout);
+        }
       } else {
         Alert.alert('Scheduling Failed', result.message, [{ text: 'OK' }]); // Show error message
       }
@@ -141,6 +218,7 @@ const ScheduleScreen = () => {
     };
     const fetchWorkoutsByUser = async () => {
       try {
+        setLoading(true);
         const response = await getWorkoutsByUser(userData.id);
         response.forEach((workout) => {
           const formattedDate = moment(workout.date).format('YYYY-MM-DD'); // Make sure it's in 'YYYY-MM-DD' format
@@ -173,6 +251,9 @@ console.log("Dates",datesToMark)
       } catch (error) {
      
       }
+      finally {
+        setLoading(false);
+      }
     };
 
     fetchWorkoutsByUser();
@@ -185,12 +266,13 @@ console.log("Dates",datesToMark)
     <View style={styles.container}>
       {/* Calendar occupying half the screen */}
       <View style={styles.calendarContainer}>
-        <Calendar
+        {loading ? <></> :<Calendar
           markedDates={markedDates}
           onDayPress={handleDayPress}
           markingType={'custom'}
           style={styles.calendar}
-        />
+        />}
+        
       </View>
 
       {/* Button to Add Workout */}
@@ -200,12 +282,23 @@ console.log("Dates",datesToMark)
 
 
       <Text style={styles.allWorkoutsTitle}>All Workouts:</Text>
-      {allWorkouts.length==0 ? <Text>You do not have scheduled workouts!</Text> : <></>}
+    
+      {loading ? (
+  <View style={styles.loaderContainer}>
+    <ActivityIndicator size="large" color="#0000ff" />
+  </View>
+) : (
+  <>
+    {allWorkouts.length == 0 ? (
+      <Text>You do not have scheduled workouts!</Text>
+    ) : (
       <FlatList
         data={allWorkouts}
         renderItem={renderWorkoutListItem}
         keyExtractor={(item, index) => index.toString()}
       />
+    )}
+  </>)}
 
       {/* Modal to Add New Workout */}
       <Modal visible={modalVisible} animationType="slide">
@@ -297,6 +390,8 @@ console.log("Dates",datesToMark)
             keyExtractor={(item, index) => index.toString()}
           />
           <Button title="Close" onPress={() => setWorkoutModalVisible(false)} />
+        
+        
         </View>
       </Modal>
     </View>

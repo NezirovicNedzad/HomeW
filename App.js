@@ -9,12 +9,14 @@ import { createDrawerNavigator } from '@react-navigation/drawer';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import DrawerNavigation from './components/DrawerNavigation';
 import { FitnessAppContext,AuthContext } from './Context';
-import { useContext } from 'react';
+
 import AuthStack from './components/AuthStack';
+import NotificationHandler from './components/NotificationHandler';
+
 
 
 export default function App() {
- 
+
 
   return (
     <FitnessAppContext>
@@ -22,9 +24,13 @@ export default function App() {
     <SafeAreaProvider>
     <AuthContext.Consumer>
           {({ isAuthenticated }) => (
-            isAuthenticated ? <DrawerNavigation /> : <AuthStack />
+            isAuthenticated ? <DrawerNavigation >
+
+            </DrawerNavigation> : <AuthStack/>
           )}
+           
         </AuthContext.Consumer>
+       
     </SafeAreaProvider>
     </FitnessAppContext>
   );

@@ -12,6 +12,7 @@ import ScheduleScreen from '../screens/Schedule';
 import CustomDrawerContent from './CustomDrawerContent';
 import HomeStack from './StackNavigator';
 import { useNavigation } from '@react-navigation/native';
+import NotificationHandler from './NotificationHandler';
 const Drawer = createDrawerNavigator();
 
 export default function DrawerNavigation( ) {
@@ -70,7 +71,7 @@ paddingTop:'60px',
           
           component={ProfileScreen} />
           
-          <Drawer.Screen name="Workout Schedule"
+          <Drawer.Screen name="Workout-Schedule"
           options={{
             drawerLabel:'Workout Schedule',
             headerTitle:'Workout Schedule',
@@ -85,6 +86,7 @@ paddingTop:'60px',
 
 
   </GestureHandlerRootView>
+  <NotificationHandler/>
       </NavigationContainer>
   );
 }
