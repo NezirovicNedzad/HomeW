@@ -128,6 +128,6 @@ const styles = StyleSheet.create({
   buttonText: {
     color: 'black', // Black text for the buttons
     fontWeight: 'bold', // Bold font
-    fontSize: 20, // Set a nice readable font size
+    fontSize: 17, // Set a nice readable font size
   },
 });

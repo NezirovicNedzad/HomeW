@@ -182,17 +182,27 @@ const ScheduleScreen = () => {
   
     return workoutsByDate;  // This will return an object grouped by date
   };
-
-  const renderWorkout = ({ item }) => (
+  const convertTo12HourFormat = (time) => {
+    const [hour, minute, second] = time.split(':');
+    const ampm = hour >= 12 ? 'PM' : 'AM';
+    const hour12 = hour % 12 || 12;  // Convert 24-hour to 12-hour format
+    return `${hour12}:${minute} ${ampm}`;
+  };
+  
+  const renderWorkout = ({ item }) =>{ 
+    
+    
+    return(
+  
     <View style={styles.workout}>
       <Text>{item.name}</Text>
-      <Text>{item.time}</Text>
+      <Text>{convertTo12HourFormat(item.time)}</Text>
     </View>
-  );
+  )};
 
   const renderWorkoutListItem = ({ item }) => (
     <View style={styles.workoutListItem}>
-      <Text>{`${item.date}: ${item.name} at ${item.time}`}</Text>
+      <Text>{`${item.date}: ${item.name} at ${convertTo12HourFormat(item.time)}`}</Text>
     </View>
   );
 
@@ -261,7 +271,7 @@ console.log("Dates",datesToMark)
     fetchWorkouts();
 
   
-  }, [userData.id]); 
+  }, [userData.id,newWorkout]); 
   return (
     <View style={styles.container}>
       {/* Calendar occupying half the screen */}
@@ -305,7 +315,7 @@ console.log("Dates",datesToMark)
         <View style={styles.modalContent}>
         <Text style={styles.label}>Select a Workout:</Text>
         <Picker
-            selectedValue={newWorkout.name}
+            selectedValue={newWorkout.programId}
             onValueChange={(itemValue) => {
               const selectedWorkout = workoutsAvailable.find((workout) => workout.id === itemValue);  // Find workout by id
               setNewWorkout({ ...newWorkout, name:selectedWorkout.naziv,programId:itemValue });  // Update name with label
@@ -314,7 +324,7 @@ console.log("Dates",datesToMark)
             style={styles.picker}
           >
             {workoutsAvailable.map((workout) => (
-              <Picker.Item key={workout.id} label={workout.naziv} value={workout.id} />
+              <Picker.Item key={workout.id} label={workout.naziv + ' difficulty: ' +workout.tip} value={workout.id} />
             ))}
           </Picker>
           {/* Button to show Date Picker */}

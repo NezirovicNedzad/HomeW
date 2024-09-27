@@ -18,6 +18,7 @@ const LoginScreen = ({ navigation }) => {
         id:result.data.id,
         username: result.data.username,
         email: result.data.email,
+        gender:result.data.gender,
         name: result.data.name,
         surname: result.data.surname,
         dateOfBirth: result.data.dateOfBirth,
