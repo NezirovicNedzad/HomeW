@@ -1,5 +1,5 @@
-import { View, Text,Image,SafeAreaView,StyleSheet ,ScrollView} from 'react-native'
-import React, { useContext } from 'react'
+import { View, Text,Image,SafeAreaView,StyleSheet ,TouchableOpacity,ScrollView, Button} from 'react-native'
+import React, { useContext, useState } from 'react'
 import FitnessCard from '../components/FitnessCard'
 import { FitnessAppItems } from '../Context';
 import ImageSlider from '../components/ImageSlider';
@@ -12,6 +12,11 @@ const HomeScreen = () => {
     calories,
     workout,
   } = useContext(FitnessAppItems);
+  const [activeButton, setActiveButton] = useState('beginner');
+  const handleDifficultySelect = async (difficulty) => {
+    setActiveButton(difficulty); // Set the active button
+   
+  };
   return (
 
     
@@ -55,7 +60,42 @@ const HomeScreen = () => {
                   />
                   </View>
         </View>
-        <FitnessCard />
+        <View style={{ flexDirection: 'row',justifyContent:"center", marginTop:45 }}>
+        <View style={styles.buttonContainer}>
+        <TouchableOpacity
+          style={[
+            styles.button,
+            activeButton === 'beginner' && styles.activeButton, // Apply active style
+          ]}
+          onPress={() => handleDifficultySelect('beginner')}
+        >
+          <Text style={styles.buttonText}>Beginner</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[
+            styles.button,
+            activeButton === 'intermediate' && styles.activeButton,
+          ]}
+          onPress={() => handleDifficultySelect('intermediate')}
+        >
+          <Text style={styles.buttonText}>Intermediate</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[
+            styles.button,
+            activeButton === 'advanced' && styles.activeButton,
+          ]}
+          onPress={() => handleDifficultySelect('advanced')}
+        >
+          <Text style={styles.buttonText}>Advanced</Text>
+        </TouchableOpacity>
+      </View>
+
+      </View>
+
+        <FitnessCard difficulty={activeButton} />
 
      
 
@@ -66,3 +106,28 @@ const HomeScreen = () => {
 }
 
 export default HomeScreen
+const styles = StyleSheet.create({
+  buttonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    marginBottom: 0,
+  },
+  button: {
+    paddingVertical: 10,
+   margin:4,
+   // White background for the buttons
+   // Center text
+   alignItems: 'center', 
+    borderBottomWidth: 2, // Bottom border for activity indication
+    borderBottomColor: 'transparent', // Hidden border by default
+    width: 120, // Fixed width for the buttons
+  },
+  activeButton: {
+    borderBottomColor: '#CD853F', // Show black border for active button
+  },
+  buttonText: {
+    color: 'black', // Black text for the buttons
+    fontWeight: 'bold', // Bold font
+    fontSize: 20, // Set a nice readable font size
+  },
+});

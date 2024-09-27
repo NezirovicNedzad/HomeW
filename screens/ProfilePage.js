@@ -1,47 +1,58 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import React, { useContext } from 'react';
-import { View, Text,StyleSheet,Button } from 'react-native';
-import { AuthContext } from '../Context';
+import React, { useEffect, useState } from 'react';
+import { View, Button, FlatList, Text,ActivityIndicator } from 'react-native';
+import { getProgramsByDifficulty } from '../services/fitnessProgramService' // Import your service
 
-export default function ProfileScreen() {
-  const { setIsAuthenticated,userData } = useContext(AuthContext);
+const ProfileScreen = () => {
+  const [results, setResults] = useState([]);
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  const handleLogout = async () => {
+  const handleDifficultySelect = async (difficulty) => {
+    setLoading(true); // Start loading
     try {
-      // Clear authentication-related data from AsyncStorage
-      await AsyncStorage.removeItem('userData'); // Assuming token is stored under 'token'
-      
-      // Update the context to reflect logout
-      setIsAuthenticated(false);
-    } catch (error) {
-      console.log('Error logging out:', error);
+      const data = await getProgramsByDifficulty(difficulty);
+      setResults(data);
+      setError('');
+    } catch (err) {
+      setError('No programs found for the selected difficulty');
+      setResults([]);
     }
+    setLoading(false); //
   };
+  useEffect(() => {
+    const fetchInitialPrograms = async () => {
+      setLoading(true); // Start loading
+      try {
+        const data = await getProgramsByDifficulty('beginner');
+        setResults(data);
+        setError('');
+      } catch (err) {
+        setError('No programs found for the initial selection');
+        setResults([]);
+      }
+      setLoading(false); // Stop loading
+    };
+
+    fetchInitialPrograms();
+  }, []); 
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.text}>Profile Screen</Text>
+    <View style={{ padding: 20 }}>
+      <View style={{ flexDirection: 'row', justifyContent: 'space-around', marginBottom: 20 }}>
+        <Button title="Beginner" onPress={() => handleDifficultySelect('beginner')} />
+        <Button title="Intermediate" onPress={() => handleDifficultySelect('intermediate')} />
+        <Button title="Advanced" onPress={() => handleDifficultySelect('advanced')} />
+      </View>
 
+      {error ? <Text style={{ color: 'red' }}>{error}</Text> : null}
 
-      <Text>Email:{userData.email}</Text>
-      <Text>Id:{userData.id}</Text>
-      <Text>Username:{userData.username}</Text>
-      <Text>Role:{userData.role}</Text>
-      <Button title="Logout" onPress={handleLogout} />
+      <FlatList
+        data={results}
+        keyExtractor={(item) => item.id.toString()} // Adjust based on your response structure
+        renderItem={({ item }) => <Text>{item.naziv}</Text>} // Adjust based on your response structure
+      />
     </View>
   );
-}
+};
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    margin: 20,
-  },
-  text: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginBottom: 20,
-  },
-});
+export default ProfileScreen;

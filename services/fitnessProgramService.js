@@ -11,3 +11,13 @@ export const getFitnesPrograms = async (u) => {
       throw error;  // Handle the error in your UI
     }
   };
+
+  export const getProgramsByDifficulty = async (param) => {
+    try {
+      const response = await axios.get(`${API_URL}FitnessProgram/search/${param}`)
+      return response.data; // Return the data from the response
+    } catch (error) {
+      console.error('Error fetching fitness programs by difficulty:', error);
+      throw error; // Re-throw the error for further handling in your component
+    }
+  };
