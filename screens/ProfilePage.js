@@ -1,5 +1,5 @@
-import React, { useContext, useEffect, useState } from 'react';
-import { View, Button, FlatList, Text,ActivityIndicator, StyleSheet, Image, TextInput, Pressable, Modal } from 'react-native';
+import React, { useCallback, useContext, useEffect, useState } from 'react';
+import { View, Button, FlatList, Text,ActivityIndicator, StyleSheet, Image, TextInput, Pressable, Modal, ScrollView } from 'react-native';
 import { getProgramsByDifficulty } from '../services/fitnessProgramService' // Import your service
 import { AuthContext } from '../Context';
 import { Ionicons } from '@expo/vector-icons';
@@ -8,12 +8,18 @@ import { useSharedValue } from 'react-native-reanimated';
 import { Slider } from 'react-native-awesome-slider';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { TouchableOpacity } from 'react-native';
-const ProfileScreen = () => {
+import { getWorkoutsClosestByUser } from '../services/workoutService';
+import WorkoutItem from '../components/WorkoutItem';
+import { useFocusEffect } from '@react-navigation/native';
+const ProfileScreen = ({navigation}) => {
   const [weight, setWeight] = useState(80.0); // Initial weight value
   const[height,setHeight]=useState(100.0)
   const[bmiValue,setBmiVlue]=useState(0)
   const[bmiRangeText,setBmiRangeText]=useState('')
   const [modalVisible, setModalVisible] = useState(false);
+  const[closestWorkouts,setClosestWorkouts]=useState([]);
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
   const incrementWeight = () => {
     setWeight(prevWeight => prevWeight + 1);
   };
@@ -30,10 +36,7 @@ const ProfileScreen = () => {
   const min = useSharedValue(100);
   const max = useSharedValue(250);
 const{userData}=useContext(AuthContext);
-const handleCalculate = () => {
-  // Handle the calculation logic
-  alert(`Your selected weight is: ${weight} kg`);
-};
+
 const calculateAge = (dateOfBirthString) => {
   // Split the date and time parts
   const [datePart, timePart] = dateOfBirthString.split(' ');
@@ -67,11 +70,36 @@ const onCalculateBmi= ()=>{
   setBmiRangeText(result <18.5? "Under Weight" : result>=18.5 && result<24.9 ? "Healthy":"Overweight")
   setModalVisible(true);
 }
-  useEffect(() => {
- 
-  }, []); 
+  
+useFocusEffect(
+  useCallback(() => {
+    const fetchWorkouts = async () => {
+      setLoading(true);
+      try {
+        const data = await getWorkoutsClosestByUser(userData.id);
+        setClosestWorkouts(data);
+        console.log(data);
+        setError('');
+      } catch (err) {
+        setError('No programs found for the initial selection');
+        setClosestWorkouts([]); // Clear results on error
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchWorkouts(); // Call fetchWorkouts every time page comes into focus
+
+    // Optionally, return a cleanup function
+    return () => {
+      // Optional cleanup actions (like canceling async tasks) can be done here
+    };
+  }, [userData.id]) // Add dependencies for the effect
+);
+
 
   return (
+    <ScrollView>
     <GestureHandlerRootView>
     <View>
     <View style={{ padding: 20,display:'flex',flexDirection:"row" }}>
@@ -99,6 +127,23 @@ const onCalculateBmi= ()=>{
      
     </View>
     <Text style={{textAlign:'center',fontSize:18,fontWeight:"900"}}>See closest scheduled workouts:</Text>
+
+    {   loading ? (
+        <ActivityIndicator style={{marginTop:10}} size="large" color="#0000ff" />
+      ) : error ? (
+        <Text style={{ color: 'red' }}>{error}</Text>
+      ) : (<View style={styles.containerF}>
+        {
+
+          closestWorkouts.map(cW=>(
+            <WorkoutItem key={cW.id} image={cW.image} programId={cW.ProgramId} exercises={cW.program.exercises} navigation={navigation} difficulty={cW.program.type} name={cW.name} date={cW.date} time={cW.time}/>
+          ))
+}
+        
+        
+      </View>)}
+
+
     <Text style={{textAlign:'center',fontSize:18,fontWeight:"900"}}>Calculate your BMI</Text>
     <View style={{paddingLeft:20,paddingRight:20}}>
      <View style={styles.hegihtView}>
@@ -186,6 +231,7 @@ const onCalculateBmi= ()=>{
       </View>
       </View>
       </GestureHandlerRootView>
+      </ScrollView>
   );
 };
 
@@ -321,7 +367,8 @@ borderRadius:30,
     paddingHorizontal: 30,
     borderRadius: 5,
     textAlign:'center',
-    marginTop: 20, // Space between the weight controls and the button
+    marginTop: 20,
+    marginBottom:20 // Space between the weight controls and the button
   },
   calculateText: {
     color: '#fff',
@@ -426,6 +473,11 @@ borderRadius:30,
   textStyle: {
     color: '#fff',
     fontWeight: 'bold',
+  },
+  containerF: {
+   
+    backgroundColor: '#f5f5f5',
+    paddingTop: 20,
   },
 }
 );

@@ -13,6 +13,11 @@ import CustomDrawerContent from './CustomDrawerContent';
 import HomeStack from './StackNavigator';
 import { useNavigation } from '@react-navigation/native';
 import NotificationHandler from './NotificationHandler';
+import { AuthContext } from '../Context';
+import { useContext } from 'react';
+import AddProgramScreen from '../screens/AddProgramScreen';
+import AddExerciseScreen from '../screens/AddExercise';
+
 const Drawer = createDrawerNavigator();
 
 export default function DrawerNavigation( ) {
@@ -22,7 +27,7 @@ export default function DrawerNavigation( ) {
  
 
 
-  
+  const {userData}=useContext(AuthContext)
     const {top,bottom}=useSafeAreaInsets();
   return (
     <NavigationContainer>
@@ -61,7 +66,9 @@ paddingTop:'60px',
             
             
             />
-          <Drawer.Screen name="Profile"
+            {userData.role=='User' && <>
+            
+              <Drawer.Screen name="Profile"
           options={{
             drawerLabel:'Profile',
             headerTitle:'My Profile',
@@ -82,6 +89,33 @@ paddingTop:'60px',
           
           component={ScheduleScreen} />
       
+            </>}
+
+            {userData.role=='Admin' && <>
+            
+            <Drawer.Screen name="AddProgram"
+        options={{
+          drawerLabel:'Add-Program',
+          headerTitle:'Add-Program',
+          drawerIcon:({size,color})=>(
+            <Ionicons name='add-circle' size={size} color={color}/>
+          )        }}
+        
+        component={AddProgramScreen} />
+        
+        <Drawer.Screen name="AddExcerises"
+        options={{
+          drawerLabel:'Add-Excerises',
+          headerTitle:'Add-Excerises',
+          drawerIcon:({size,color})=>(
+            <Ionicons name='add-circle' size={size} color={color}/>
+          )        }}
+        
+        
+        component={AddExerciseScreen} />
+    
+          </>}
+         
         </Drawer.Navigator>
 
 

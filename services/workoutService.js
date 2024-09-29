@@ -54,4 +54,34 @@ export const getWorkoutsByUser = async (userId) => {
       }
     }
   };
+
+  export const getWorkoutsClosestByUser = async (userId) => {
+    try {
+      const response = await axios.get(`${API_URL}workout/${userId}`);  // Pass userId in the URL
+      return response.data;  // Success response, return the workout data
+    } catch (error) {
+      if (error.response && error.response.data) {
+        let errorMessage;
+  
+        // Check if the error message is a string
+        if (typeof error.response.data.message === 'string') {
+          errorMessage = error.response.data.message;
+        } 
+        // If the message is an object, try to stringify it
+        else if (typeof error.response.data.message === 'object') {
+          errorMessage = JSON.stringify(error.response.data.message);
+        } 
+        // If it's another format (array, etc.), handle it as fallback
+        else {
+          errorMessage = 'An unexpected error occurred';
+        }
+  
+      
+       
+      } else {
+       
+        throw new Error('Network error, please try again later');
+      }
+    }
+  };
   

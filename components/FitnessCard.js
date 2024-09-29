@@ -4,6 +4,7 @@ import fitness from '../data/fitness'
 import { MaterialCommunityIcons } from '@expo/vector-icons'
 import { useNavigation } from '@react-navigation/native'
 import { getProgramsByDifficulty } from '../services/fitnessProgramService'
+import { API_BASE, API_URL } from '../config/config'
 
 const FitnessCard = ({difficulty}) => {
 
@@ -17,7 +18,7 @@ const FitnessCard = ({difficulty}) => {
         setLoading(true);
         try {
           const data = await getProgramsByDifficulty(difficulty);
-          
+          console.log(data)
           setResults(data);
           setError('');
         } catch (err) {
@@ -44,13 +45,13 @@ const FitnessCard = ({difficulty}) => {
 
           <Pressable  onPress={() => navigation.navigate('Workout',
           {
-            image:"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRrEM-6gDUO7g1cdrNhBaqk_0nwxy6ILlIqsQ&usqp=CAU",
+            image:`${API_BASE}/${item.image}`,
             excersises:item.exercises,
              id:item.id
           }
           )} style={{alignItems:"center",justifyContent:"center",margin:10}} key={key}>
   
-              <Image style={{width:"100%",height:140,borderRadius:7}} source={{uri:"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRrEM-6gDUO7g1cdrNhBaqk_0nwxy6ILlIqsQ&usqp=CAU"}} />
+              <Image style={{width:"100%",height:140,borderRadius:7}} source={{uri: `${API_BASE}/${item.image}` }} />
               <Text style={{position:"absolute",color:"white",fontSize:16,fontWeight:"bold",left:20,top:20,textTransform:"uppercase"}}>{item.name} {difficulty}</Text>
               <Text style={{position:"absolute",color:"white",fontSize:16,fontWeight:"500",left:20,top:45,textTransform:"uppercase"}}> {item.exercises.length} EXERCISES</Text>
               

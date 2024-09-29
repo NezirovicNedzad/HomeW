@@ -2,6 +2,7 @@ import { View, Text,SafeAreaView,Image, Pressable } from 'react-native'
 import React, { useContext, useEffect, useState } from 'react'
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { FitnessAppItems} from '../Context';
+import { API_BASE_GIF } from '../config/config';
 
 const FitScreen = ({navigation}) => {
       
@@ -23,12 +24,12 @@ const {
   workout,
 } = useContext(FitnessAppItems);
 
-
+console.log(current)
 
   return (
     <SafeAreaView>
         <View style={{marginTop:30}}>
-      <Image style={{width:"100%",height:370}} source={{uri:current.image}}/>
+      <Image style={{width:"100%",height:370}} source={{uri:`${API_BASE_GIF}/${current.image}`}}  resizeMode="contain" />
       <Text style={{marginLeft:"auto",marginRight:"auto",marginTop:30,fontSize:30,fontWeight:"bold"}}>{current.name}</Text>
       <Text style={{marginLeft:"auto",marginRight:"auto",marginTop:30,fontSize:38,fontWeight:"bold"}}>x{current.sets}</Text>
 
