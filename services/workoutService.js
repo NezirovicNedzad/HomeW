@@ -85,3 +85,18 @@ export const getWorkoutsByUser = async (userId) => {
     }
   };
   
+  export const deleteWorkout = async (Id) => {
+    try {
+      const response = await axios.delete(`${API_URL}Workout/delete/${Id}`);
+      
+      // Return success if the workout was deleted
+      return {
+        success: true,
+        message: 'Workout deleted successfully.',
+      };
+    } catch (error) {
+      console.error('Failed to delete workout:', error.response ? error.response.data : error.message);
+      
+  
+    }
+  };

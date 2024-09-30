@@ -3,6 +3,7 @@ import { View, TextInput, Button, Text, StyleSheet,Image } from 'react-native';
 import * as DocumentPicker from 'expo-document-picker';
 import axios from 'axios';
 import { Picker } from '@react-native-picker/picker';
+import { API_URL } from '../config/config';
   // Still using expo-image for displaying GIFs
 
 const AddExerciseScreen = ({navigate}) => {
@@ -18,7 +19,7 @@ const AddExerciseScreen = ({navigate}) => {
   useEffect(() => {
     const fetchPrograms = async () => {
       try {
-        const response = await axios.get('https://b2ff-91-187-148-172.ngrok-free.app/api/fitnessprogram');  // Replace with your actual endpoint
+        const response = await axios.get(`${API_URL}fitnessprogram`);  // Replace with your actual endpoint
         setPrograms(response.data);
         console.log(response.data);
       } catch (error) {
@@ -71,7 +72,7 @@ const AddExerciseScreen = ({navigate}) => {
 
     try {
       const response = await axios.post(
-        'https://b2ff-91-187-148-172.ngrok-free.app/api/excersise',  // Replace with your API endpoint
+        `${API_URL}excersise`,  // Replace with your API endpoint
         formData,
         {
           headers: {
@@ -86,7 +87,7 @@ const AddExerciseScreen = ({navigate}) => {
         setDescription('')
         setSets('')
         setDuration('')
-        selectedProgram('')
+       
       }
     } catch (error) {
    

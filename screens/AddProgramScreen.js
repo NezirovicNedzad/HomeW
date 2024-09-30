@@ -61,7 +61,7 @@ const AddProgramScreen = () => {
     console.log("Form Data Parts:");
     console.log(formData)
     try {
-      const response = await axios.post('https://b2ff-91-187-148-172.ngrok-free.app/api/FitnessProgram', formData, {
+      const response = await axios.post(`${API_URL}/FitnessProgram`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },

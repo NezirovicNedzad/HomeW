@@ -128,20 +128,30 @@ useFocusEffect(
     </View>
     <Text style={{textAlign:'center',fontSize:18,fontWeight:"900"}}>See closest scheduled workouts:</Text>
 
-    {   loading ? (
-        <ActivityIndicator style={{marginTop:10}} size="large" color="#0000ff" />
-      ) : error ? (
-        <Text style={{ color: 'red' }}>{error}</Text>
-      ) : (<View style={styles.containerF}>
-        {
+    {loading ? (
+  <ActivityIndicator style={{ marginTop: 10 }} size="large" color="#0000ff" />
+) : error ? (
+  <Text style={{ color: 'red' }}>{error}</Text>
+) : closestWorkouts && closestWorkouts.length > 0 ? ( // Ensure closestWorkouts exists and is not empty
+  <View style={styles.containerF}>
+    {closestWorkouts.map(cW => (
+      <WorkoutItem
+        key={cW.id}
+        image={cW.image}
+        programId={cW.ProgramId}
+        exercises={cW.program.exercises}
+        navigation={navigation}
+        difficulty={cW.program.type}
+        name={cW.name}
+        date={cW.date}
+        time={cW.time}
+      />
+    ))}
+  </View>
+) : (
+  <Text style={{ textAlign: 'center', marginTop: 20 }}>You have not scheduled any workouts</Text> // Fallback message
+)}
 
-          closestWorkouts.map(cW=>(
-            <WorkoutItem key={cW.id} image={cW.image} programId={cW.ProgramId} exercises={cW.program.exercises} navigation={navigation} difficulty={cW.program.type} name={cW.name} date={cW.date} time={cW.time}/>
-          ))
-}
-        
-        
-      </View>)}
 
 
     <Text style={{textAlign:'center',fontSize:18,fontWeight:"900"}}>Calculate your BMI</Text>

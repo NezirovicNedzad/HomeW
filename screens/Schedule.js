@@ -6,12 +6,14 @@ import * as Notifications from 'expo-notifications';
 
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { Picker } from '@react-native-picker/picker';
-import { createWorkout } from '../services/workoutService';
+import { createWorkout, deleteWorkout } from '../services/workoutService';
 import { getFitnesPrograms } from '../services/fitnessProgramService';
 import { getWorkoutsByUser } from '../services/workoutService';
 import { AuthContext } from '../Context';
 import moment from 'moment-timezone';
 import { ActivityIndicator } from 'react-native';
+import { TouchableOpacity } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 
 
 // Ask for notification permissions
@@ -189,7 +191,9 @@ const ScheduleScreen = () => {
     return `${hour12}:${minute} ${ampm}`;
   };
   
-  const renderWorkout = ({ item }) =>{ 
+  const renderWorkout = ({ item }) =>{
+    
+     
     
     
     return(
@@ -197,14 +201,54 @@ const ScheduleScreen = () => {
     <View style={styles.workout}>
       <Text>{item.name}</Text>
       <Text>{convertTo12HourFormat(item.time)}</Text>
+      
     </View>
   )};
 
-  const renderWorkoutListItem = ({ item }) => (
+  const handleDelete = async (id) => {
+    Alert.alert(
+      'Delete Workout',
+      'Are you sure you want to cancel this workout?',
+      [
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+        {
+          text: 'Delete',
+          onPress: async () => {
+            const result = await deleteWorkout(id);
+            if (result.success) {
+              Alert.alert('Success', result.message);
+            fetchWorkoutsByUser();
+              
+              // Optionally, refresh the workout list after deletion
+            } else {
+              Alert.alert('Error', result.message);
+            }
+          },
+          style: 'destructive',
+        },
+      ]
+    );
+  };
+
+  const renderWorkoutListItem = ({ item }) => {
+
+
+
+  return(
     <View style={styles.workoutListItem}>
-      <Text>{`${item.date}: ${item.name} at ${convertTo12HourFormat(item.time)}`}</Text>
+     <View style={{display:'flex',flexDirection:'row'}}>
+
+     <Text style={{flex:1}}>{`${item.date}: ${item.name} at ${convertTo12HourFormat(item.time)}`}</Text>
+      <TouchableOpacity onPress={()=>handleDelete(item.workoutId)} style={styles.deleteButton}>
+        <Ionicons name="trash-outline" size={24} color="red" />
+      </TouchableOpacity>
+     </View>
+      
     </View>
-  );
+  )};
 
   const allWorkouts = Object.keys(workouts).flatMap((date) =>
     Array.isArray(workouts[date]) ? 
@@ -214,6 +258,46 @@ const ScheduleScreen = () => {
       })) 
       : [] // If it's not an array, return an empty array to avoid errors
   );
+  const fetchWorkoutsByUser = async () => {
+    try {
+      setLoading(true);
+      const response = await getWorkoutsByUser(userData.id);
+      response.forEach((workout) => {
+        const formattedDate = moment(workout.date).format('YYYY-MM-DD'); // Make sure it's in 'YYYY-MM-DD' format
+        workout.date=formattedDate
+      }
+    );
+  
+    
+      setWorkouts(groupWorkoutsByDate(response))
+      const datesToMark = {};
+    
+      response.forEach((workout) => {
+        const formattedDate = moment(workout.date).format('YYYY-MM-DD'); // Make sure it's in 'YYYY-MM-DD' format
+        datesToMark[formattedDate] = {
+          marked: true,
+          dotColor: 'blue',
+          customStyles: {
+            container: { backgroundColor: '#e6ffe6' },
+            text: { color: 'blue', fontWeight: 'bold' }
+          }
+        };
+      }
+    );
+
+console.log("Dates",datesToMark)
+      setMarkedDates(datesToMark);
+   // Store the fetched workouts in state
+      console.log("Workouts for this user ",response);
+    } catch (error) {
+   
+    }
+    finally {
+      setLoading(false);
+    }
+  };
+
+  
   useEffect(() => {
     const fetchWorkouts = async () => {
       try {
@@ -226,50 +310,13 @@ const ScheduleScreen = () => {
         Alert.alert('Error', 'Failed to fetch workouts');
       }
     };
-    const fetchWorkoutsByUser = async () => {
-      try {
-        setLoading(true);
-        const response = await getWorkoutsByUser(userData.id);
-        response.forEach((workout) => {
-          const formattedDate = moment(workout.date).format('YYYY-MM-DD'); // Make sure it's in 'YYYY-MM-DD' format
-          workout.date=formattedDate
-        }
-      );
     
-      
-        setWorkouts(groupWorkoutsByDate(response))
-        const datesToMark = {};
-      
-        response.forEach((workout) => {
-          const formattedDate = moment(workout.date).format('YYYY-MM-DD'); // Make sure it's in 'YYYY-MM-DD' format
-          datesToMark[formattedDate] = {
-            marked: true,
-            dotColor: 'blue',
-            customStyles: {
-              container: { backgroundColor: '#e6ffe6' },
-              text: { color: 'blue', fontWeight: 'bold' }
-            }
-          };
-        }
-      );
-
-
-console.log("Dates",datesToMark)
-        setMarkedDates(datesToMark);
-     // Store the fetched workouts in state
-        console.log("Workouts for this user ",response);
-      } catch (error) {
-     
-      }
-      finally {
-        setLoading(false);
-      }
-    };
 
     fetchWorkoutsByUser();
 
     fetchWorkouts();
 
+    
   
   }, [userData.id,newWorkout]); 
   return (
@@ -459,6 +506,12 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     fontWeight: 'bold',
   },
+  deleteButton: {
+    marginLeft: 16,
+    alignSelf:"flex-end",
+    
+  },
+ 
 });
 
 export default ScheduleScreen;
